@@ -50,7 +50,7 @@ class SudokuGame:
             os.remove(os.path.join(difficulty_dir, chosen))
             if len(board_list) <= 1:
                 main(5, difficulty)
-        except FileNotFoundError:
+        except (FileNotFoundError, IndexError):
             main(5, difficulty)
             difficulty_dir = os.path.join(os.getcwd(), "boards", difficulty)
             board_list = os.listdir(difficulty_dir)
