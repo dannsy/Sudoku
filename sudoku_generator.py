@@ -62,9 +62,12 @@ def main(num, difficulty):
         num (int): number of boards to generate
         difficulty (str): "easy", "medium", or "hard"
     """
-    Path("/boards/easy").mkdir(parents=True, exist_ok=True)
-    Path("/boards/medium").mkdir(parents=True, exist_ok=True)
-    Path("/boards/hard").mkdir(parents=True, exist_ok=True)
+    Path(os.path.join(os.getcwd(), "boards", "easy")).mkdir(parents=True, exist_ok=True)
+    Path(os.path.join(os.getcwd(), "boards", "medium")).mkdir(
+        parents=True, exist_ok=True
+    )
+    Path(os.path.join(os.getcwd(), "boards", "hard")).mkdir(parents=True, exist_ok=True)
+
     difficulty_dir = os.path.join(os.getcwd(), "boards", difficulty)
     board_list = os.listdir(difficulty_dir)
     num_list = [int(f.split("_")[0]) for f in board_list]

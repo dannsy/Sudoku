@@ -41,14 +41,23 @@ class SudokuGame:
     def choose_board(self, difficulty):
         """Choose a random board from generated boards
         """
-        difficulty_dir = os.path.join(os.getcwd(), "boards", difficulty)
-        board_list = os.listdir(difficulty_dir)
-        chosen = random.choice(board_list)
-        print(chosen)
-        self.generated_board = np.load(os.path.join(difficulty_dir, chosen))
-        os.remove(os.path.join(difficulty_dir, chosen))
-        if len(board_list) <= 1:
+        try:
+            difficulty_dir = os.path.join(os.getcwd(), "boards", difficulty)
+            board_list = os.listdir(difficulty_dir)
+            chosen = random.choice(board_list)
+            print(chosen)
+            self.generated_board = np.load(os.path.join(difficulty_dir, chosen))
+            os.remove(os.path.join(difficulty_dir, chosen))
+            if len(board_list) <= 1:
+                main(5, difficulty)
+        except FileNotFoundError:
             main(5, difficulty)
+            difficulty_dir = os.path.join(os.getcwd(), "boards", difficulty)
+            board_list = os.listdir(difficulty_dir)
+            chosen = random.choice(board_list)
+            print(chosen)
+            self.generated_board = np.load(os.path.join(difficulty_dir, chosen))
+            os.remove(os.path.join(difficulty_dir, chosen))
 
     def select_button(self, pos):
         """Get selected button from mouse position and activate it
