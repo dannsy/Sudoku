@@ -21,8 +21,8 @@ LIGHT_BLUE = (160, 180, 220)
 BLUE = (50, 50, 200)
 RED = (255, 0, 0)
 # dimensions of display
-WIDTH = 450
-HEIGHT = 505
+WIDTH = 540
+HEIGHT = 660
 
 
 class SudokuGui:
@@ -50,6 +50,7 @@ class SudokuGui:
         self.cells = np.empty((9, 9), dtype=Cell)
         # 2D numpy array to store notes of cells
         self.cells_notes = np.empty((9, 9), dtype=set)
+        count = 0
         for i in range(9):
             for j in range(9):
                 num = self.board[i, j]
@@ -57,6 +58,14 @@ class SudokuGui:
                 self.cells_notes[i, j] = set()
                 if num != 0:
                     self.num_pos[num].add((i, j))
+                    count += 1
+
+        if count >= 38:
+            self.difficulty = "EASY"
+        elif count >= 30:
+            self.difficulty = "MEDIUM"
+        else:
+            self.difficulty = "HARD"
 
         # indicating which cell is selected
         self.selected_row = None
@@ -67,7 +76,8 @@ class SudokuGui:
         self.width = WIDTH
         self.height = HEIGHT
         self.spacing = self.width // 9
-        self.display = pygame.display.set_mode((self.width, self.height))
+        self.top_padding = self.spacing
+        self.display = None
 
         # False is number input, True is notes input
         self.mode = False
@@ -76,6 +86,7 @@ class SudokuGui:
         # stores the states of the game
         self.state = deque()
         self.time_elapsed = 0
+        self.clock = None
         self.solver = None
 
     def check_cell(self, row, col):
@@ -122,54 +133,72 @@ class SudokuGui:
 
         # highlight selected row, col, surrounding, and cells with same number
         if self.selected_cell is not None:
-            row_top = self.spacing * self.selected_row
-            self.display.fill(LIGHT_GREY, pygame.Rect(0, row_top, 450, 50))
+            row_top = self.spacing * self.selected_row + self.top_padding
+            self.display.fill(
+                LIGHT_GREY, pygame.Rect(0, row_top, self.width, self.spacing)
+            )
             col_left = self.spacing * self.selected_col
-            self.display.fill(LIGHT_GREY, pygame.Rect(col_left, 0, 50, 450))
-            row_start = self.selected_row // 3 * 3 * self.spacing
+            self.display.fill(
+                LIGHT_GREY,
+                pygame.Rect(col_left, self.top_padding, self.spacing, self.width),
+            )
+            row_start = self.selected_row // 3 * 3 * self.spacing + self.top_padding
             col_start = self.selected_col // 3 * 3 * self.spacing
-            self.display.fill(LIGHT_GREY, pygame.Rect(col_start, row_start, 150, 150))
+            self.display.fill(
+                LIGHT_GREY,
+                pygame.Rect(col_start, row_start, self.spacing * 3, self.spacing * 3),
+            )
 
             for pos in self.num_pos[self.board[self.selected_row, self.selected_col]]:
                 self.display.fill(
                     NUM_GREY,
-                    pygame.Rect(pos[1] * self.spacing, pos[0] * self.spacing, 50, 50),
+                    pygame.Rect(
+                        pos[1] * self.spacing,
+                        self.top_padding + pos[0] * self.spacing,
+                        self.spacing,
+                        self.spacing,
+                    ),
                 )
 
         thin_line = 1
         thick_line = 3
         # drawing the grey thin grid lines
         for i in range(10):
+            # horizontal lines
             pygame.draw.line(
                 self.display,
                 GREY,
-                (0, i * self.spacing),
-                (self.width, i * self.spacing),
+                (0, i * self.spacing + self.top_padding),
+                (self.width, i * self.spacing + self.top_padding),
                 thin_line,
             )
+            # vertical lines
             pygame.draw.line(
                 self.display,
                 GREY,
-                (i * self.spacing, 0),
-                (i * self.spacing, self.width),
+                (i * self.spacing, self.top_padding),
+                (i * self.spacing, self.width + self.top_padding),
                 thin_line,
             )
         # drawing the black thick grid lines
         for i in range(0, 10, 3):
+            # horizontal lines
             pygame.draw.line(
                 self.display,
                 BLACK,
-                (0, self.spacing * i),
-                (self.width, self.spacing * i),
+                (0, i * self.spacing + self.top_padding),
+                (self.width, i * self.spacing + self.top_padding),
                 thick_line,
             )
+            # vertical lines
             pygame.draw.line(
                 self.display,
                 BLACK,
-                (self.spacing * i, 0),
-                (self.spacing * i, self.width),
+                (i * self.spacing, self.top_padding),
+                (i * self.spacing, self.width + self.top_padding),
                 thick_line,
             )
+
         # calling method to draw numbers in cells
         for i, row in enumerate(self.cells):
             for j, cell in enumerate(row):
@@ -177,32 +206,39 @@ class SudokuGui:
                 cell.draw_cell(self.display)
 
         # back to main menu arrow
-        pygame.draw.polygon(self.display, BLACK, ((310, 475), (330, 455), (330, 495)))
-        pygame.draw.rect(self.display, BLACK, (325, 465, 40, 20))
+        pygame.draw.polygon(self.display, BLACK, ((10, 30), (30, 10), (30, 50)))
+        pygame.draw.rect(self.display, BLACK, (20, 20, 40, 20))
 
-        time_font = pygame.font.SysFont("timesnewroman", 30)
+        font = pygame.font.SysFont("timesnewroman", 30)
         # indicate the time elapsed since the game has started
-        text = time_font.render(
+        text = font.render(
             str(self.time_elapsed // 60) + ":" + str(self.time_elapsed % 60),
             True,
             BLACK,
         )
-        self.display.blit(text, (390, 460))
+        self.display.blit(text, (470, 15))
+
+        # # fps counter
+        # fps = str(self.clock.get_fps())
+        # fps_text = time_font.render(fps, True, BLACK)
+        # self.display.blit(fps_text, (470, 610))
+
+        text = font.render(self.difficulty, True, BLACK)
+        self.display.blit(text, (self.width / 2 - text.get_width() / 2, 15))
+
         # indicate whether notes mode is ON
         if self.mode:
-            font = pygame.font.SysFont("timesnewroman", 30)
             text = font.render("N", True, BLACK)
-            self.display.blit(text, (10, 460))
+            self.display.blit(text, (10, 610))
 
         if self.fill_own:
-            font = pygame.font.SysFont("timesnewroman", 30)
             text = font.render("I", True, BLACK)
-            self.display.blit(text, (50, 460))
+            self.display.blit(text, (50, 610))
 
         if total == 81 and self.check_board_validity():
             font = pygame.font.SysFont("timesnewroman", 20)
             text = font.render("CONGRATS!", True, BLACK)
-            self.display.blit(text, (self.width / 2 - text.get_width() / 2, 465))
+            self.display.blit(text, (self.width / 2 - text.get_width() / 2, 615))
 
     def update_cells(self):
         """Updates the graphical representation of cells.
@@ -279,10 +315,14 @@ class SudokuGui:
             pos (tup of 2 ints): pos[0] is the x-position of mouse,
                 pos[1] is the y-position of mouse
         """
-        if (pos[0] < self.width) and (pos[1] < self.width):
+        if (
+            pos[0] < self.width
+            and pos[1] > self.top_padding
+            and pos[1] < self.width + self.top_padding
+        ):
             # if play clicks inside grid, select cell
-            col = int(pos[0] // self.spacing)
-            row = int(pos[1] // self.spacing)
+            col = pos[0] // self.spacing
+            row = (pos[1] - self.top_padding) // self.spacing
             self.selected_row = row
             self.selected_col = col
 
@@ -293,7 +333,7 @@ class SudokuGui:
 
         self.change_selection()
 
-        if pos[0] > 305 and pos[0] < 370 and pos[1] > 450 and pos[1] < 500:
+        if pos[0] > 10 and pos[0] < 60 and pos[1] > 10 and pos[1] < 50:
             # if player clicks on back arrow, return to main menu
             self.running = False
 
@@ -327,9 +367,12 @@ class SudokuGui:
     def start_game(self):
         """Starts the Sudoku game
         """
+        self.display = pygame.display.set_mode((self.width, self.height))
+        self.clock = pygame.time.Clock()
         self.sudoku_gui()
         pygame.display.set_caption("Sudoku")
         start = time.time()
+
         # main loop of Sudoku
         while self.running:
             self.time_elapsed = round(time.time() - start)
@@ -482,6 +525,7 @@ class SudokuGui:
                                 num
                             )
 
+            self.clock.tick(60)
             self.sudoku_gui()
             pygame.display.update()
 
@@ -506,6 +550,12 @@ class Cell:
         self.width = WIDTH
         self.height = HEIGHT
         self.spacing = self.width / 9
+        self.top_padding = self.spacing
+        # font for cell
+        self.font = pygame.font.SysFont("timesnewroman", 34)
+        self.note_font = pygame.font.SysFont("timesnewroman", 20)
+        self.cell_x = self.spacing * self.col
+        self.cell_y = self.spacing * self.row + self.top_padding
         # boolean value to determine whether a cell is currently selected
         self.selected = False
 
@@ -515,42 +565,42 @@ class Cell:
         Args:
             display (pygame display): The Sudoku GUI
         """
-        # font for the number
-        font = pygame.font.SysFont("timesnewroman", 30)
-        note_font = pygame.font.SysFont("timesnewroman", 15)
-        cell_x = self.spacing * self.col
-        cell_y = self.spacing * self.row
         # displaying base number on cell
         if self.base_num != 0:
-            text = font.render(str(self.base_num), True, BLACK)
+            text = self.font.render(str(self.base_num), True, BLACK)
             display.blit(
                 text,
                 (
-                    cell_x + (self.spacing / 2 - text.get_width() / 2),
-                    cell_y + (self.spacing / 2 - text.get_height() / 2),
+                    self.cell_x + (self.spacing / 2 - text.get_width() / 2),
+                    self.cell_y + (self.spacing / 2 - text.get_height() / 2),
                 ),
             )
         # displaying player input number on cell
         if not self.note_using and self.can_update and self.new_num != 0:
-            text = font.render(str(self.new_num), True, self.color)
+            text = self.font.render(str(self.new_num), True, self.color)
             display.blit(
                 text,
                 (
-                    cell_x + (self.spacing / 2 - text.get_width() / 2),
-                    cell_y + (self.spacing / 2 - text.get_height() / 2),
+                    self.cell_x + (self.spacing / 2 - text.get_width() / 2),
+                    self.cell_y + (self.spacing / 2 - text.get_height() / 2),
                 ),
             )
         # displaying notes on cell
         elif self.note_using and self.can_update:
             for num in self.notes:
-                text = note_font.render(str(num), True, GREY)
+                text = self.note_font.render(str(num), True, GREY)
                 note_x = (num - 1) % 3
                 note_y = (num - 1) // 3
-                display.blit(text, (cell_x + note_x * 15 + 5, cell_y + note_y * 15))
+                display.blit(
+                    text, (self.cell_x + note_x * 19 + 6, self.cell_y + note_y * 19)
+                )
         # draw a red rectangle around selected cell
         if self.selected:
             pygame.draw.rect(
-                display, LIGHT_BLUE, (cell_x, cell_y, self.spacing, self.spacing), 2
+                display,
+                LIGHT_BLUE,
+                (self.cell_x, self.cell_y, self.spacing, self.spacing),
+                2,
             )
 
     def __repr__(self):

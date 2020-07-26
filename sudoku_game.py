@@ -16,8 +16,8 @@ WHITE = (255, 255, 255)
 LIGHT_BLUE = (170, 170, 230)
 WHITE_BLUE = (200, 200, 235)
 # dimensions of display
-WIDTH = 450
-HEIGHT = 505
+WIDTH = 540
+HEIGHT = 660
 
 
 class SudokuGame:
@@ -27,14 +27,23 @@ class SudokuGame:
     def __init__(self):
         self.width = WIDTH
         self.height = HEIGHT
-        self.display = pygame.display.set_mode((self.width, self.height))
+        self.display = None
         self.running = True
         self.play_pressed = False
-        self.but0_height = 340
-        self.but1_height = 400
-        self.image_top = 100
-        self.image_left = 135
-        self.spacing = 60
+
+        self.bigbut_xpos = self.width / 3
+        self.bigbut0_ypos = self.height * 0.7
+        self.bigbut1_ypos = self.height * 0.8
+        self.bigbut_height = self.height * 0.1 - 6
+        self.bigbut_width = self.width / 3
+
+        self.smallbut_xpos = self.width / 3 * 2 + 10
+        self.smallbut_width = self.bigbut_width * 0.6
+        self.smallbut_height = self.bigbut_height * 0.6
+
+        self.image_top = self.height * 0.2
+        self.image_left = self.width * 0.25
+        self.spacing = self.width * 0.5 / 3
         self.generated_board = None
         self.start_main()
 
@@ -66,30 +75,55 @@ class SudokuGame:
             pos (tup of 2 ints): pos[0] is the x-position of mouse,
                 pos[1] is the y-position of mouse
         """
-        if pos[0] > 170 and pos[0] < 280:
-            if pos[1] > self.but0_height and pos[1] < self.but0_height + 45:
-                self.play_pressed = True
-            elif pos[1] > self.but1_height and pos[1] < self.but1_height + 45:
-                sudoku_game = SudokuGui(np.zeros((9, 9), dtype=int), fill_own=True)
-                sudoku_game.start_game()
-
-        elif self.play_pressed and pos[0] > 300 and pos[0] < 370:
-            if pos[1] > self.but0_height - 20 and pos[1] < self.but0_height + 5:
-                self.choose_board("easy")
-                sudoku_game = SudokuGui(self.generated_board)
-                sudoku_game.start_game()
-                self.play_pressed = False
-            elif pos[1] > self.but0_height + 10 and pos[1] < self.but0_height + 35:
-                self.choose_board("medium")
-                sudoku_game = SudokuGui(self.generated_board)
-                sudoku_game.start_game()
-                self.play_pressed = False
-            elif pos[1] > self.but0_height + 40 and pos[1] < self.but0_height + 65:
-                self.choose_board("hard")
-                sudoku_game = SudokuGui(self.generated_board)
-                sudoku_game.start_game()
-                self.play_pressed = False
-
+        temp = self.bigbut_height - self.smallbut_height
+        if (
+            pos[0] > self.bigbut_xpos
+            and pos[0] < self.bigbut_xpos + self.bigbut_width
+            and pos[1] > self.bigbut0_ypos
+            and pos[1] < self.bigbut0_ypos + self.bigbut_height
+        ):
+            self.play_pressed = True
+        elif (
+            pos[0] > self.bigbut_xpos
+            and pos[0] < self.bigbut_xpos + self.bigbut_width
+            and pos[1] > self.bigbut1_ypos
+            and pos[1] < self.bigbut1_ypos + self.bigbut_height
+        ):
+            sudoku_game = SudokuGui(np.zeros((9, 9), dtype=int), fill_own=True)
+            sudoku_game.start_game()
+        elif (
+            self.play_pressed
+            and pos[0] > self.smallbut_xpos
+            and pos[0] < self.smallbut_xpos + self.smallbut_width
+            and pos[1] > self.bigbut0_ypos - self.smallbut_height
+            and pos[1] < self.bigbut0_ypos
+        ):
+            self.choose_board("easy")
+            sudoku_game = SudokuGui(self.generated_board)
+            sudoku_game.start_game()
+            self.play_pressed = False
+        elif (
+            self.play_pressed
+            and pos[0] > self.smallbut_xpos
+            and pos[0] < self.smallbut_xpos + self.smallbut_width
+            and pos[1] > self.bigbut0_ypos + temp / 2
+            and pos[1] < self.bigbut0_ypos + temp / 2 + self.smallbut_height
+        ):
+            self.choose_board("medium")
+            sudoku_game = SudokuGui(self.generated_board)
+            sudoku_game.start_game()
+            self.play_pressed = False
+        elif (
+            self.play_pressed
+            and pos[0] > self.smallbut_xpos
+            and pos[0] < self.smallbut_xpos + self.smallbut_width
+            and pos[1] > self.bigbut0_ypos + self.bigbut_height
+            and pos[1] < self.bigbut0_ypos + self.bigbut_height + self.smallbut_height
+        ):
+            self.choose_board("hard")
+            sudoku_game = SudokuGui(self.generated_board)
+            sudoku_game.start_game()
+            self.play_pressed = False
         else:
             self.play_pressed = False
 
@@ -117,14 +151,14 @@ class SudokuGame:
             self.display,
             BLACK,
             (self.image_left, self.image_top + self.spacing),
-            (self.width - 135, self.image_top + self.spacing),
+            (self.width - self.image_left, self.image_top + self.spacing),
             2,
         )
         pygame.draw.line(
             self.display,
             BLACK,
             (self.image_left, self.image_top + self.spacing * 2),
-            (self.image_left + self.spacing * 3, self.image_top + self.spacing * 2),
+            (self.width - self.image_left, self.image_top + self.spacing * 2),
             2,
         )
         pygame.draw.line(
@@ -161,42 +195,109 @@ class SudokuGame:
 
         # drawing button and logo
         if self.play_pressed:
-            self.display.fill(WHITE_BLUE, pygame.Rect(170, self.but0_height, 110, 45))
+            # PLAY button after pressed
             self.display.fill(
-                LIGHT_BLUE, pygame.Rect(300, self.but0_height - 20, 70, 25)
+                WHITE_BLUE,
+                pygame.Rect(
+                    self.bigbut_width,
+                    self.bigbut0_ypos,
+                    self.bigbut_width,
+                    self.bigbut_height,
+                ),
             )
+            # EASY button
             self.display.fill(
-                LIGHT_BLUE, pygame.Rect(300, self.but0_height + 10, 70, 25)
+                LIGHT_BLUE,
+                pygame.Rect(
+                    self.smallbut_xpos,
+                    self.bigbut0_ypos - self.smallbut_height,
+                    self.smallbut_width,
+                    self.smallbut_height,
+                ),
             )
+            temp = self.bigbut_height - self.smallbut_height
+            # MEDIUM button
             self.display.fill(
-                LIGHT_BLUE, pygame.Rect(300, self.but0_height + 40, 70, 25)
+                LIGHT_BLUE,
+                pygame.Rect(
+                    self.smallbut_xpos,
+                    self.bigbut0_ypos + temp / 2,
+                    self.smallbut_width,
+                    self.smallbut_height,
+                ),
+            )
+            # HARD button
+            self.display.fill(
+                LIGHT_BLUE,
+                pygame.Rect(
+                    self.smallbut_xpos,
+                    self.bigbut0_ypos + self.bigbut_height,
+                    self.smallbut_width,
+                    self.smallbut_height,
+                ),
             )
             font = pygame.font.SysFont("arial", 18)
             text = font.render("EASY", True, BLACK)
-            self.display.blit(text, (305, self.but0_height - 18))
+            self.display.blit(
+                text,
+                (self.smallbut_xpos + 15, self.bigbut0_ypos - self.smallbut_height + 6),
+            )
             text = font.render("MEDIUM", True, BLACK)
-            self.display.blit(text, (305, self.but0_height + 12))
+            self.display.blit(
+                text, (self.smallbut_xpos + 15, self.bigbut0_ypos + temp / 2 + 6)
+            )
             text = font.render("HARD", True, BLACK)
-            self.display.blit(text, (305, self.but0_height + 42))
+            self.display.blit(
+                text,
+                (self.smallbut_xpos + 15, self.bigbut0_ypos + self.bigbut_height + 6),
+            )
         else:
-            self.display.fill(LIGHT_BLUE, pygame.Rect(170, self.but0_height, 110, 45))
-        self.display.fill(LIGHT_BLUE, pygame.Rect(170, self.but1_height, 110, 45))
+            # PLAY button before pressed
+            self.display.fill(
+                LIGHT_BLUE,
+                pygame.Rect(
+                    self.bigbut_width,
+                    self.bigbut0_ypos,
+                    self.bigbut_width,
+                    self.bigbut_height,
+                ),
+            )
+        # INPUT button
+        self.display.fill(
+            LIGHT_BLUE,
+            pygame.Rect(
+                self.bigbut_width,
+                self.bigbut1_ypos,
+                self.bigbut_width,
+                self.bigbut_height,
+            ),
+        )
 
         font = pygame.font.SysFont("arial", 40)
         text = font.render("SUDOKU", True, BLACK)
-        self.display.blit(text, (155, 30))
+        self.display.blit(text, (self.width / 2 - text.get_width() / 2, 50))
 
         font = pygame.font.SysFont("arial", 30)
         text = font.render("PLAY", True, BLACK)
-        self.display.blit(text, (192, self.but0_height + 4))
+        self.display.blit(
+            text, (self.width / 2 - text.get_width() / 2, self.bigbut0_ypos + 10)
+        )
 
         font = pygame.font.SysFont("arial", 30)
         text = font.render("INPUT", True, BLACK)
-        self.display.blit(text, (187, self.but1_height + 4))
+        self.display.blit(
+            text, (self.width / 2 - text.get_width() / 2, self.bigbut1_ypos + 10)
+        )
+
+        # fps = str(self.clock.get_fps())
+        # fps_text = font.render(fps, True, BLACK)
+        # self.display.blit(fps_text, (470, 610))
 
     def start_main(self):
         """Starts the main menu
         """
+        self.display = pygame.display.set_mode((self.width, self.height))
+        self.clock = pygame.time.Clock()
         self.menu_gui()
         pygame.display.set_caption("Sudoku")
         # main loop of main menu
@@ -214,6 +315,7 @@ class SudokuGame:
                 # if event.type == pygame.KEYDOWN:
                 #     keys = pygame.key.get_pressed()
 
+            self.clock.tick(60)
             self.menu_gui()
             pygame.display.update()
 
