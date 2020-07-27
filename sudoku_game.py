@@ -19,6 +19,8 @@ WHITE_BLUE = (200, 200, 235)
 WIDTH = 540
 HEIGHT = 660
 
+FPS_FLAG = False
+
 
 class SudokuGame:
     """Creates the main menu launches game depending on player choice
@@ -302,9 +304,10 @@ class SudokuGame:
             text, (self.width // 2 - text.get_width() // 2, self.bigbut1_ypos + 10)
         )
 
-        # fps = str(self.clock.get_fps())
-        # fps_text = font.render(fps, True, BLACK)
-        # self.display.blit(fps_text, (470, 610))
+        if FPS_FLAG:
+            fps = str(self.clock.get_fps())
+            fps_text = font.render(fps, True, BLACK)
+            self.display.blit(fps_text, (470, 610))
 
     def start_main(self):
         """Starts the main menu
