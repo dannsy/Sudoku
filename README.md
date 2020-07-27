@@ -1,0 +1,15 @@
+# Sudoku
+This is a sudoku game which includes the GUI, board solver, and board generator. Run sudoku_game.py to play!
+
+# Key-bindings
+"n": Toggle notes mode
+
+"d+[1-9]": Delete number in cell if number matches pressed number key
+
+"SPACE": Solve sudoku board
+
+"shift+c": Clear sudoku board
+
+"ctrl+z": Undo last action
+
+"ESCAPE": Quit current game
