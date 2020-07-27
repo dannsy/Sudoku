@@ -31,19 +31,19 @@ class SudokuGame:
         self.running = True
         self.play_pressed = False
 
-        self.bigbut_xpos = self.width / 3
-        self.bigbut0_ypos = self.height * 0.7
-        self.bigbut1_ypos = self.height * 0.8
-        self.bigbut_height = self.height * 0.1 - 6
-        self.bigbut_width = self.width / 3
+        self.bigbut_xpos = int(self.width / 3)
+        self.bigbut0_ypos = int(self.height * 0.7)
+        self.bigbut1_ypos = int(self.height * 0.8)
+        self.bigbut_height = int(self.height * 0.1 - 6)
+        self.bigbut_width = int(self.width / 3)
 
-        self.smallbut_xpos = self.width / 3 * 2 + 10
-        self.smallbut_width = self.bigbut_width * 0.6
-        self.smallbut_height = self.bigbut_height * 0.6
+        self.smallbut_xpos = int(self.width / 3 * 2 + 10)
+        self.smallbut_width = int(self.bigbut_width * 0.6)
+        self.smallbut_height = int(self.bigbut_height * 0.6)
 
-        self.image_top = self.height * 0.2
-        self.image_left = self.width * 0.25
-        self.spacing = self.width * 0.5 / 3
+        self.image_top = int(self.height * 0.2)
+        self.image_left = int(self.width * 0.25)
+        self.spacing = int(self.width * 0.5 / 3)
         self.generated_board = None
         self.start_main()
 
@@ -75,7 +75,8 @@ class SudokuGame:
             pos (tup of 2 ints): pos[0] is the x-position of mouse,
                 pos[1] is the y-position of mouse
         """
-        temp = self.bigbut_height - self.smallbut_height
+        temp = (self.bigbut_height - self.smallbut_height) // 2
+        # PLAY
         if (
             pos[0] > self.bigbut_xpos
             and pos[0] < self.bigbut_xpos + self.bigbut_width
@@ -83,6 +84,7 @@ class SudokuGame:
             and pos[1] < self.bigbut0_ypos + self.bigbut_height
         ):
             self.play_pressed = True
+        # INPUT
         elif (
             pos[0] > self.bigbut_xpos
             and pos[0] < self.bigbut_xpos + self.bigbut_width
@@ -91,6 +93,7 @@ class SudokuGame:
         ):
             sudoku_game = SudokuGui(np.zeros((9, 9), dtype=int), fill_own=True)
             sudoku_game.start_game()
+        # EASY
         elif (
             self.play_pressed
             and pos[0] > self.smallbut_xpos
@@ -102,17 +105,19 @@ class SudokuGame:
             sudoku_game = SudokuGui(self.generated_board)
             sudoku_game.start_game()
             self.play_pressed = False
+        # MEDIUM
         elif (
             self.play_pressed
             and pos[0] > self.smallbut_xpos
             and pos[0] < self.smallbut_xpos + self.smallbut_width
-            and pos[1] > self.bigbut0_ypos + temp / 2
-            and pos[1] < self.bigbut0_ypos + temp / 2 + self.smallbut_height
+            and pos[1] > self.bigbut0_ypos + temp
+            and pos[1] < self.bigbut0_ypos + temp + self.smallbut_height
         ):
             self.choose_board("medium")
             sudoku_game = SudokuGui(self.generated_board)
             sudoku_game.start_game()
             self.play_pressed = False
+        # HARD
         elif (
             self.play_pressed
             and pos[0] > self.smallbut_xpos
@@ -138,7 +143,7 @@ class SudokuGame:
         font = pygame.font.SysFont("arial", 30)
         text = font.render(str(num), True, BLACK)
         self.display.blit(
-            text, (img_x - text.get_width() / 2, img_y - text.get_height() / 2),
+            text, (img_x - text.get_width() // 2, img_y - text.get_height() // 2),
         )
 
     def menu_gui(self):
@@ -178,19 +183,27 @@ class SudokuGame:
 
         # drawing 1, 3, 5, 7, 9
         self.image_cell(
-            1, self.image_left + self.spacing / 2, self.image_top + self.spacing / 2
+            1, self.image_left + self.spacing // 2, self.image_top + self.spacing // 2
         )
         self.image_cell(
-            3, self.image_left + self.spacing * 2.5, self.image_top + self.spacing / 2
+            3,
+            self.image_left + self.spacing * 5 // 2,
+            self.image_top + self.spacing // 2,
         )
         self.image_cell(
-            5, self.image_left + self.spacing * 1.5, self.image_top + self.spacing * 1.5
+            5,
+            self.image_left + self.spacing * 3 // 2,
+            self.image_top + self.spacing * 3 // 2,
         )
         self.image_cell(
-            7, self.image_left + self.spacing / 2, self.image_top + self.spacing * 2.5
+            7,
+            self.image_left + self.spacing // 2,
+            self.image_top + self.spacing * 5 // 2,
         )
         self.image_cell(
-            9, self.image_left + self.spacing * 2.5, self.image_top + self.spacing * 2.5
+            9,
+            self.image_left + self.spacing * 5 // 2,
+            self.image_top + self.spacing * 5 // 2,
         )
 
         # drawing button and logo
@@ -215,13 +228,13 @@ class SudokuGame:
                     self.smallbut_height,
                 ),
             )
-            temp = self.bigbut_height - self.smallbut_height
+            temp = (self.bigbut_height - self.smallbut_height) // 2
             # MEDIUM button
             self.display.fill(
                 LIGHT_BLUE,
                 pygame.Rect(
                     self.smallbut_xpos,
-                    self.bigbut0_ypos + temp / 2,
+                    self.bigbut0_ypos + temp,
                     self.smallbut_width,
                     self.smallbut_height,
                 ),
@@ -244,7 +257,7 @@ class SudokuGame:
             )
             text = font.render("MEDIUM", True, BLACK)
             self.display.blit(
-                text, (self.smallbut_xpos + 15, self.bigbut0_ypos + temp / 2 + 6)
+                text, (self.smallbut_xpos + 15, self.bigbut0_ypos + temp + 6)
             )
             text = font.render("HARD", True, BLACK)
             self.display.blit(
@@ -275,18 +288,18 @@ class SudokuGame:
 
         font = pygame.font.SysFont("arial", 40)
         text = font.render("SUDOKU", True, BLACK)
-        self.display.blit(text, (self.width / 2 - text.get_width() / 2, 50))
+        self.display.blit(text, (self.width // 2 - text.get_width() // 2, 50))
 
         font = pygame.font.SysFont("arial", 30)
         text = font.render("PLAY", True, BLACK)
         self.display.blit(
-            text, (self.width / 2 - text.get_width() / 2, self.bigbut0_ypos + 10)
+            text, (self.width // 2 - text.get_width() // 2, self.bigbut0_ypos + 10)
         )
 
         font = pygame.font.SysFont("arial", 30)
         text = font.render("INPUT", True, BLACK)
         self.display.blit(
-            text, (self.width / 2 - text.get_width() / 2, self.bigbut1_ypos + 10)
+            text, (self.width // 2 - text.get_width() // 2, self.bigbut1_ypos + 10)
         )
 
         # fps = str(self.clock.get_fps())

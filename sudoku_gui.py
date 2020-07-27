@@ -24,6 +24,8 @@ RED = (255, 0, 0)
 WIDTH = 540
 HEIGHT = 660
 
+FPS_FLAG = False
+
 
 class SudokuGui:
     """Class representing the GUI of a Sudoku board
@@ -83,6 +85,7 @@ class SudokuGui:
         self.mode = False
         # determines whether the game is still running
         self.running = True
+        self.quitted = False
         # stores the states of the game
         self.state = deque()
         self.time_elapsed = 0
@@ -212,19 +215,20 @@ class SudokuGui:
         font = pygame.font.SysFont("timesnewroman", 30)
         # indicate the time elapsed since the game has started
         text = font.render(
-            str(self.time_elapsed // 60) + ":" + str(self.time_elapsed % 60),
+            f"{(self.time_elapsed // 60):02}:{(self.time_elapsed % 60):02}",
             True,
             BLACK,
         )
         self.display.blit(text, (470, 15))
 
-        # # fps counter
-        # fps = str(self.clock.get_fps())
-        # fps_text = time_font.render(fps, True, BLACK)
-        # self.display.blit(fps_text, (470, 610))
+        if FPS_FLAG:
+            # fps counter
+            fps = str(self.clock.get_fps())
+            fps_text = font.render(fps, True, BLACK)
+            self.display.blit(fps_text, (470, 610))
 
         text = font.render(self.difficulty, True, BLACK)
-        self.display.blit(text, (self.width / 2 - text.get_width() / 2, 15))
+        self.display.blit(text, (self.width // 2 - text.get_width() // 2, 15))
 
         # indicate whether notes mode is ON
         if self.mode:
@@ -236,9 +240,8 @@ class SudokuGui:
             self.display.blit(text, (50, 610))
 
         if total == 81 and self.check_board_validity():
-            font = pygame.font.SysFont("timesnewroman", 20)
             text = font.render("CONGRATS!", True, BLACK)
-            self.display.blit(text, (self.width / 2 - text.get_width() / 2, 615))
+            self.display.blit(text, (self.width // 2 - text.get_width() // 2, 610))
 
     def update_cells(self):
         """Updates the graphical representation of cells.
@@ -291,7 +294,7 @@ class SudokuGui:
         for i in range(9):
             for j in range(9):
                 cell = self.cells[i, j]
-                cell.note.clear()
+                cell.notes.clear()
         self.solver = SudokuSolver(self.board)
 
     def change_selection(self):
@@ -549,7 +552,7 @@ class Cell:
         self.col = col
         self.width = WIDTH
         self.height = HEIGHT
-        self.spacing = self.width / 9
+        self.spacing = self.width // 9
         self.top_padding = self.spacing
         # font for cell
         self.font = pygame.font.SysFont("timesnewroman", 34)
@@ -571,8 +574,8 @@ class Cell:
             display.blit(
                 text,
                 (
-                    self.cell_x + (self.spacing / 2 - text.get_width() / 2),
-                    self.cell_y + (self.spacing / 2 - text.get_height() / 2),
+                    self.cell_x + (self.spacing // 2 - text.get_width() // 2),
+                    self.cell_y + (self.spacing // 2 - text.get_height() // 2),
                 ),
             )
         # displaying player input number on cell
@@ -581,8 +584,8 @@ class Cell:
             display.blit(
                 text,
                 (
-                    self.cell_x + (self.spacing / 2 - text.get_width() / 2),
-                    self.cell_y + (self.spacing / 2 - text.get_height() / 2),
+                    self.cell_x + (self.spacing // 2 - text.get_width() // 2),
+                    self.cell_y + (self.spacing // 2 - text.get_height() // 2),
                 ),
             )
         # displaying notes on cell
