@@ -1,6 +1,7 @@
 """This module contains SudokuGame class.
 Starts the Sudoku game.
 """
+import multiprocessing
 import os
 import random
 
@@ -60,7 +61,9 @@ class SudokuGame:
             self.generated_board = np.load(os.path.join(difficulty_dir, chosen))
             os.remove(os.path.join(difficulty_dir, chosen))
             if len(board_list) <= 1:
-                main(5, difficulty)
+                p1 = multiprocessing.Process(target=main, args=[10, difficulty])
+                p1.start()
+                # main(5, difficulty)
         except (FileNotFoundError, IndexError):
             main(5, difficulty)
             difficulty_dir = os.path.join(os.getcwd(), "boards", difficulty)
