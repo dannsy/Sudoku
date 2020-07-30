@@ -1,5 +1,6 @@
 # Sudoku
 This is a sudoku game which includes the GUI, board solver, and board generator. Run sudoku_game.py to play!
+Or run sudoku_visual.py and press SPACE to see the board solved visually!
 
 # Key-bindings
 "n": Toggle notes mode
