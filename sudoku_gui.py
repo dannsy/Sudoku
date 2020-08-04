@@ -31,6 +31,12 @@ class SudokuGui:
     """Class representing the GUI of a Sudoku board
     """
 
+    # the width and height of the game display
+    width = WIDTH
+    height = HEIGHT
+    spacing = width // 9
+    top_padding = spacing
+
     def __init__(self, board, fill_own=False):
         self.board = board.copy()
         self.board_backup = self.board.copy()
@@ -74,13 +80,6 @@ class SudokuGui:
         self.selected_col = None
         self.selected_cell = None
 
-        # the width and height of the game display
-        self.width = WIDTH
-        self.height = HEIGHT
-        self.spacing = self.width // 9
-        self.top_padding = self.spacing
-        self.display = None
-
         # False is number input, True is notes input
         self.mode = False
         # determines whether the game is still running
@@ -91,6 +90,7 @@ class SudokuGui:
         self.time_elapsed = 0
         self.clock = None
         self.solver = None
+        self.display = None
 
     def check_cell(self, row, col):
         """Checks whether specified cell is still legal
@@ -537,6 +537,11 @@ class Cell:
     """Class representing a cell in a Sudoku board
     """
 
+    width = WIDTH
+    height = HEIGHT
+    spacing = width // 9
+    top_padding = spacing
+
     def __init__(self, num, row, col):
         self.base_num = num
         # boolean value to determine whether a cell can be updated (base numbers cannot be updated)
@@ -550,15 +555,11 @@ class Cell:
         self.note_using = False
         self.row = row
         self.col = col
-        self.width = WIDTH
-        self.height = HEIGHT
-        self.spacing = self.width // 9
-        self.top_padding = self.spacing
+        self.cell_x = self.spacing * self.col
+        self.cell_y = self.spacing * self.row + self.top_padding
         # font for cell
         self.font = pygame.font.SysFont("timesnewroman", 34)
         self.note_font = pygame.font.SysFont("timesnewroman", 20)
-        self.cell_x = self.spacing * self.col
-        self.cell_y = self.spacing * self.row + self.top_padding
         # boolean value to determine whether a cell is currently selected
         self.selected = False
 

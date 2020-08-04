@@ -27,26 +27,27 @@ class SudokuGame:
     """Creates the main menu launches game depending on player choice
     """
 
+    width = WIDTH
+    height = HEIGHT
+    display = None
+
+    bigbut_xpos = int(width / 3)
+    bigbut0_ypos = int(height * 0.7)
+    bigbut1_ypos = int(height * 0.8)
+    bigbut_height = int(height * 0.1 - 6)
+    bigbut_width = int(width / 3)
+
+    smallbut_xpos = int(width / 3 * 2 + 10)
+    smallbut_width = int(bigbut_width * 0.6)
+    smallbut_height = int(bigbut_height * 0.6)
+
+    image_top = int(height * 0.2)
+    image_left = int(width * 0.25)
+    spacing = int(width * 0.5 / 3)
+
     def __init__(self):
-        self.width = WIDTH
-        self.height = HEIGHT
-        self.display = None
         self.running = True
         self.play_pressed = False
-
-        self.bigbut_xpos = int(self.width / 3)
-        self.bigbut0_ypos = int(self.height * 0.7)
-        self.bigbut1_ypos = int(self.height * 0.8)
-        self.bigbut_height = int(self.height * 0.1 - 6)
-        self.bigbut_width = int(self.width / 3)
-
-        self.smallbut_xpos = int(self.width / 3 * 2 + 10)
-        self.smallbut_width = int(self.bigbut_width * 0.6)
-        self.smallbut_height = int(self.bigbut_height * 0.6)
-
-        self.image_top = int(self.height * 0.2)
-        self.image_left = int(self.width * 0.25)
-        self.spacing = int(self.width * 0.5 / 3)
         self.generated_board = None
         self.start_main()
 
