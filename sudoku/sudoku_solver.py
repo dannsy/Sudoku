@@ -11,9 +11,6 @@ import random
 
 import numpy as np
 
-NUM_SET = {1, 2, 3, 4, 5, 6, 7, 8, 9}
-NUM_LIST = [1, 2, 3, 4, 5, 6, 7, 8, 9]
-
 
 def _timer(func):
     """Measure the time taken to execute func
@@ -35,6 +32,9 @@ def _timer(func):
 class SudokuSolver:
     """Given a Sudoku board, solves it using altered backtracking algorithm
     """
+
+    NUM_SET = {1, 2, 3, 4, 5, 6, 7, 8, 9}
+    NUM_LIST = [1, 2, 3, 4, 5, 6, 7, 8, 9]
 
     def __init__(self, board):
         self.board = board
@@ -119,11 +119,11 @@ class SudokuSolver:
         Returns:
             set: set containing possible numbers
         """
-        row_set = NUM_SET - set(self.board[row])
-        col_set = NUM_SET - set(self.board[:, col])
+        row_set = self.NUM_SET - set(self.board[row])
+        col_set = self.NUM_SET - set(self.board[:, col])
         r_beg = row // 3 * 3
         c_beg = col // 3 * 3
-        box_set = NUM_SET - set(
+        box_set = self.NUM_SET - set(
             self.board[r_beg : r_beg + 3, c_beg : c_beg + 3].flatten()
         )
 
@@ -343,7 +343,7 @@ class SudokuRandomSolver(SudokuSolver):
         """
         cur_val = self.board[row, col]
         random.seed(self.time_now + row * 9 + col)
-        num_list = NUM_LIST.copy()
+        num_list = self.NUM_LIST.copy()
         random.shuffle(num_list)
         if self.row == row and self.col == col:
             num_list.remove(self.num)

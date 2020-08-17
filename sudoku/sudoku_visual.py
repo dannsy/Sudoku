@@ -13,9 +13,6 @@ import pygame
 from sudoku_gui import SudokuGui
 from sudoku_solver import SudokuSolver
 
-NUM_SET = {1, 2, 3, 4, 5, 6, 7, 8, 9}
-NUM_LIST = [1, 2, 3, 4, 5, 6, 7, 8, 9]
-
 
 class SudokuVisualSolver(SudokuGui, SudokuSolver):
     """Class representing the GUI of a Sudoku board

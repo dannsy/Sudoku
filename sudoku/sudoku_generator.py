@@ -9,19 +9,19 @@ import numpy as np
 
 from sudoku_solver import SudokuRandomSolver
 
-NUM_RANGE = list(range(81))
-
 
 class SudokuGenerator:
     """Generates a Sudoku board
     """
+
+    NUM_RANGE = list(range(81))
 
     def __init__(self, total_cells=30):
         solver = SudokuRandomSolver(np.zeros((9, 9), dtype=int))
         solver.solve()
         print(solver.board)
         self.board = solver.board.copy()
-        self.num_range = NUM_RANGE.copy()
+        self.num_range = self.NUM_RANGE.copy()
         self.remove_order = []
         self.to_remove = 81 - total_cells
         self.generate_order()

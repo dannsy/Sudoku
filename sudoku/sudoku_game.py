@@ -9,8 +9,8 @@ import sys
 import numpy as np
 import pygame
 
-from sudoku_gui import SudokuGui
 from sudoku_generator import main
+from sudoku_gui import SudokuGui
 
 # color definitions
 BLACK = (0, 0, 0)
@@ -73,7 +73,7 @@ class SudokuGame:
                 pro1 = multiprocessing.Process(target=main, args=[10, difficulty])
                 pro1.start()
         except (FileNotFoundError, IndexError):
-            main(5, difficulty)
+            main(2, difficulty)
             difficulty_dir = os.path.join(os.getcwd(), "boards", difficulty)
             board_list = os.listdir(difficulty_dir)
             chosen = random.choice(board_list)

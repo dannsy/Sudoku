@@ -9,8 +9,8 @@ Or run sudoku_visual.py and press SPACE to see the board solved visually!
 
 "SPACE": Solve sudoku board
 
-"shift+c": Clear sudoku board
+"CTRL+c": Clear sudoku board
 
-"ctrl+z": Undo last action
+"CTRL+z": Undo last action
 
-"ESCAPE": Quit current game
+"ESC": Quit current game
