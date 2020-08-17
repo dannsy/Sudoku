@@ -92,4 +92,4 @@ def main(num, difficulty):
 
 
 if __name__ == "__main__":
-    main(25, "hard")
+    main(5, "hard")

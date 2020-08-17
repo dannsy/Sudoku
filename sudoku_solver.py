@@ -15,8 +15,25 @@ NUM_SET = {1, 2, 3, 4, 5, 6, 7, 8, 9}
 NUM_LIST = [1, 2, 3, 4, 5, 6, 7, 8, 9]
 
 
+def _timer(func):
+    """Measure the time taken to execute func
+
+    Args:
+        func (def): function to have execution time measured
+    """
+
+    def wrapper(*args, **kwargs):
+        start_time = datetime.datetime.now()
+        func(*args, *kwargs)
+        end_time = datetime.datetime.now()
+        time_elapsed = str(end_time - start_time)[:-4]
+        print(f"Time elapsed for {func.__name__}: {time_elapsed}")
+
+    return wrapper
+
+
 class SudokuSolver:
-    """Given a Sudoku board, solves it using backtracking algorithm
+    """Given a Sudoku board, solves it using altered backtracking algorithm
     """
 
     def __init__(self, board):
@@ -34,11 +51,9 @@ class SudokuSolver:
             row (int): row of specified cell
             col (int): col of specified cell
         """
-        copied = self.possible[row, col].copy()
-        pos = self.possible[row, col]
+        pos = self.possible[row, col].copy()
         if len(pos) == 1:
             self.board[row, col] = pos.pop()
-        self.possible[row, col] = copied
 
     def fill_row(self, row, col):
         """If specified cell has unique number that no other cells in
@@ -48,16 +63,14 @@ class SudokuSolver:
             row (int): row of specified cell
             col (int): col of specified cell
         """
-        copied = self.possible[row, col].copy()
-        pos = self.possible[row, col]
+        pos = self.possible[row, col].copy()
         for index, cell in enumerate(self.possible[row]):
             if index != col:
                 pos -= cell
             if not pos:
                 break
-        if pos:
+        else:
             self.board[row, col] = pos.pop()
-        self.possible[row, col] = copied
 
     def fill_col(self, row, col):
         """If specified cell has unique number that no other cells in
@@ -67,16 +80,14 @@ class SudokuSolver:
             row (int): row of specified cell
             col (int): col of specified cell
         """
-        copied = self.possible[row, col].copy()
-        pos = self.possible[row, col]
+        pos = self.possible[row, col].copy()
         for index, cell in enumerate(self.possible[:, col]):
             if index != row:
                 pos -= cell
             if not pos:
                 break
-        if pos:
+        else:
             self.board[row, col] = pos.pop()
-        self.possible[row, col] = copied
 
     def fill_box(self, row, col):
         """If specified cell has unique number that no other cells in
@@ -86,22 +97,17 @@ class SudokuSolver:
             row (int): row of specified cell
             col (int): col of specified cell
         """
-        row_start = row // 3 * 3
-        col_start = col // 3 * 3
-        copied = self.possible[row, col].copy()
-        pos = self.possible[row, col]
-        for index, cell in enumerate(
-            self.possible[
-                row_start : row_start + 3, col_start : col_start + 3
-            ].flatten()
-        ):
+        r_beg = row // 3 * 3
+        c_beg = col // 3 * 3
+        pos = self.possible[row, col].copy()
+        flattened = self.possible[r_beg : r_beg + 3, c_beg : c_beg + 3].flatten()
+        for index, cell in enumerate(flattened):
             if index != (row % 3) * 3 + (col % 3):
                 pos -= cell
             if not pos:
                 break
-        if pos:
+        else:
             self.board[row, col] = pos.pop()
-        self.possible[row, col] = copied
 
     def get_possible(self, row, col):
         """Get possible nums for specified cell
@@ -115,10 +121,10 @@ class SudokuSolver:
         """
         row_set = NUM_SET - set(self.board[row])
         col_set = NUM_SET - set(self.board[:, col])
-        row_start = row // 3 * 3
-        col_start = col // 3 * 3
+        r_beg = row // 3 * 3
+        c_beg = col // 3 * 3
         box_set = NUM_SET - set(
-            self.board[row_start : row_start + 3, col_start : col_start + 3].flatten()
+            self.board[r_beg : r_beg + 3, c_beg : c_beg + 3].flatten()
         )
 
         return row_set.intersection(col_set, box_set)
@@ -184,12 +190,13 @@ class SudokuSolver:
         # checking col
         col_bool = np.sum(self.board[:, col]) == sum(set(self.board[:, col]))
         # checking box
-        row_start = row // 3 * 3
-        col_start = col // 3 * 3
-        box = self.board[row_start : row_start + 3, col_start : col_start + 3].flatten()
+        r_beg = row // 3 * 3
+        c_beg = col // 3 * 3
+        box = self.board[r_beg : r_beg + 3, c_beg : c_beg + 3].flatten()
         box_bool = np.sum(box) == sum(set(box))
         return row_bool == col_bool == box_bool == True
 
+    @_timer
     def solve(self):
         """Solves the Sudoku board with backtracking
         """
@@ -220,7 +227,6 @@ class SudokuRandomSolver(SudokuSolver):
     def __init__(self, board, row=None, col=None, num=None):
         super().__init__(board)
         self.time_now = datetime.datetime.now().timestamp()
-        self.possible = np.empty((9, 9), dtype=set)
         # optional exclusion num
         self.row = row
         self.col = col
@@ -233,14 +239,12 @@ class SudokuRandomSolver(SudokuSolver):
             row (int): row of specified cell
             col (int): col of specified cell
         """
-        copied = self.possible[row, col].copy()
-        pos = self.possible[row, col]
+        pos = self.possible[row, col].copy()
         if len(pos) == 1:
             num = pos.pop()
             if self.row == row and self.col == col and self.num == num:
                 return False
             self.board[row, col] = num
-        self.possible[row, col] = copied
         return True
 
     def fill_row(self, row, col):
@@ -251,19 +255,17 @@ class SudokuRandomSolver(SudokuSolver):
             row (int): row of specified cell
             col (int): col of specified cell
         """
-        copied = self.possible[row, col].copy()
-        pos = self.possible[row, col]
+        pos = self.possible[row, col].copy()
         for index, cell in enumerate(self.possible[row]):
             if index != col:
                 pos -= cell
             if not pos:
                 break
-        if pos:
+        else:
             num = pos.pop()
             if self.row == row and self.col == col and self.num == num:
                 return False
             self.board[row, col] = num
-        self.possible[row, col] = copied
         return True
 
     def fill_col(self, row, col):
@@ -274,19 +276,17 @@ class SudokuRandomSolver(SudokuSolver):
             row (int): row of specified cell
             col (int): col of specified cell
         """
-        copied = self.possible[row, col].copy()
-        pos = self.possible[row, col]
+        pos = self.possible[row, col].copy()
         for index, cell in enumerate(self.possible[:, col]):
             if index != row:
                 pos -= cell
             if not pos:
                 break
-        if pos:
+        else:
             num = pos.pop()
             if self.row == row and self.col == col and self.num == num:
                 return False
             self.board[row, col] = num
-        self.possible[row, col] = copied
         return True
 
     def fill_box(self, row, col):
@@ -297,25 +297,20 @@ class SudokuRandomSolver(SudokuSolver):
             row (int): row of specified cell
             col (int): col of specified cell
         """
-        row_start = row // 3 * 3
-        col_start = col // 3 * 3
-        copied = self.possible[row, col].copy()
-        pos = self.possible[row, col]
-        for index, cell in enumerate(
-            self.possible[
-                row_start : row_start + 3, col_start : col_start + 3
-            ].flatten()
-        ):
+        r_beg = row // 3 * 3
+        c_beg = col // 3 * 3
+        pos = self.possible[row, col].copy()
+        flattened = self.possible[r_beg : r_beg + 3, c_beg : c_beg + 3].flatten()
+        for index, cell in enumerate(flattened):
             if index != (row % 3) * 3 + (col % 3):
                 pos -= cell
             if not pos:
                 break
-        if pos:
+        else:
             num = pos.pop()
             if self.row == row and self.col == col and self.num == num:
                 return False
             self.board[row, col] = num
-        self.possible[row, col] = copied
         return True
 
     def preprocess(self):
@@ -395,20 +390,20 @@ class SudokuRandomSolver(SudokuSolver):
 
 if __name__ == "__main__":
     # 2D list to represent the board, with value 0 representing empty cells
-    # # 1.65 sec
-    # test_board = np.array(
-    #     [
-    #         [9, 8, 4, 0, 0, 0, 5, 0, 1],
-    #         [0, 0, 0, 5, 0, 0, 0, 0, 7],
-    #         [0, 0, 0, 0, 0, 0, 0, 0, 9],
-    #         [0, 0, 0, 0, 1, 0, 0, 0, 0],
-    #         [0, 2, 0, 7, 0, 3, 1, 0, 0],
-    #         [5, 6, 0, 0, 0, 0, 0, 0, 0],
-    #         [8, 0, 0, 0, 0, 0, 4, 9, 6],
-    #         [0, 0, 0, 0, 9, 0, 0, 0, 0],
-    #         [1, 0, 0, 2, 8, 0, 0, 0, 0],
-    #     ]
-    # )
+    # 1.65 sec
+    test_board = np.array(
+        [
+            [9, 8, 4, 0, 0, 0, 5, 0, 1],
+            [0, 0, 0, 5, 0, 0, 0, 0, 7],
+            [0, 0, 0, 0, 0, 0, 0, 0, 9],
+            [0, 0, 0, 0, 1, 0, 0, 0, 0],
+            [0, 2, 0, 7, 0, 3, 1, 0, 0],
+            [5, 6, 0, 0, 0, 0, 0, 0, 0],
+            [8, 0, 0, 0, 0, 0, 4, 9, 6],
+            [0, 0, 0, 0, 9, 0, 0, 0, 0],
+            [1, 0, 0, 2, 8, 0, 0, 0, 0],
+        ]
+    )
 
     # test_board = np.array(
     #     [
@@ -439,20 +434,20 @@ if __name__ == "__main__":
     #     ]
     # )
 
-    # HARDEST SUDOKU, 8 seconds
-    test_board = np.array(
-        [
-            [8, 0, 0, 0, 0, 0, 0, 0, 0],
-            [0, 0, 3, 6, 0, 0, 0, 0, 0],
-            [0, 7, 0, 0, 9, 0, 2, 0, 0],
-            [0, 5, 0, 0, 0, 7, 0, 0, 0],
-            [0, 0, 0, 0, 4, 5, 7, 0, 0],
-            [0, 0, 0, 1, 0, 0, 0, 3, 0],
-            [0, 0, 1, 0, 0, 0, 0, 6, 8],
-            [0, 0, 8, 5, 0, 0, 0, 1, 0],
-            [0, 9, 0, 0, 0, 0, 4, 0, 0],
-        ]
-    )
+    # # HARDEST SUDOKU, 8 seconds
+    # test_board = np.array(
+    #     [
+    #         [8, 0, 0, 0, 0, 0, 0, 0, 0],
+    #         [0, 0, 3, 6, 0, 0, 0, 0, 0],
+    #         [0, 7, 0, 0, 9, 0, 2, 0, 0],
+    #         [0, 5, 0, 0, 0, 7, 0, 0, 0],
+    #         [0, 0, 0, 0, 4, 5, 7, 0, 0],
+    #         [0, 0, 0, 1, 0, 0, 0, 3, 0],
+    #         [0, 0, 1, 0, 0, 0, 0, 6, 8],
+    #         [0, 0, 8, 5, 0, 0, 0, 1, 0],
+    #         [0, 9, 0, 0, 0, 0, 4, 0, 0],
+    #     ]
+    # )
 
     solver = SudokuSolver(test_board)
     solver.solve()
