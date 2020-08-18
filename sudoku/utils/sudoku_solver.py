@@ -12,23 +12,6 @@ import random
 import numpy as np
 
 
-def _timer(func):
-    """Measure the time taken to execute func
-
-    Args:
-        func (def): function to have execution time measured
-    """
-
-    def wrapper(*args, **kwargs):
-        start_time = datetime.datetime.now()
-        func(*args, *kwargs)
-        end_time = datetime.datetime.now()
-        time_elapsed = str(end_time - start_time)[:-4]
-        print(f"Time elapsed for {func.__name__}: {time_elapsed}")
-
-    return wrapper
-
-
 class SudokuSolver:
     """Given a Sudoku board, solves it using altered backtracking algorithm
     """
@@ -196,7 +179,6 @@ class SudokuSolver:
         box_bool = np.sum(box) == sum(set(box))
         return row_bool == col_bool == box_bool == True
 
-    @_timer
     def solve(self):
         """Solves the Sudoku board with backtracking
         """

@@ -9,8 +9,9 @@ import sys
 import numpy as np
 import pygame
 
-from sudoku_generator import main
-from sudoku_gui import SudokuGui
+from sudoku import BOARD_LOC
+from sudoku.utils.sudoku_generator import main
+from sudoku.utils.sudoku_gui import SudokuGui
 
 # color definitions
 BLACK = (0, 0, 0)
@@ -63,7 +64,7 @@ class SudokuGame:
         """Choose a random board from generated boards
         """
         try:
-            difficulty_dir = os.path.join(os.getcwd(), "boards", difficulty)
+            difficulty_dir = os.path.join(BOARD_LOC, difficulty)
             board_list = os.listdir(difficulty_dir)
             chosen = random.choice(board_list)
             print(chosen)
@@ -74,7 +75,7 @@ class SudokuGame:
                 pro1.start()
         except (FileNotFoundError, IndexError):
             main(2, difficulty)
-            difficulty_dir = os.path.join(os.getcwd(), "boards", difficulty)
+            difficulty_dir = os.path.join(BOARD_LOC, difficulty)
             board_list = os.listdir(difficulty_dir)
             chosen = random.choice(board_list)
             print(chosen)
@@ -251,9 +252,6 @@ class SudokuGame:
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     mouse_pos = pygame.mouse.get_pos()
                     self.select_button(mouse_pos)
-                # # getting keyboard input
-                # if event.type == pygame.KEYDOWN:
-                #     keys = pygame.key.get_pressed()
 
             self.clock.tick(60)
             self.menu_gui()
@@ -265,7 +263,3 @@ def main_game():
     """
     pygame.init()
     SudokuGame()
-
-
-if __name__ == "__main__":
-    main_game()

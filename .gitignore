@@ -1,4 +1,4 @@
 .vscode
-sudoku/boards
-sudoku/__pycache__
+boards
+__pycache__
 env

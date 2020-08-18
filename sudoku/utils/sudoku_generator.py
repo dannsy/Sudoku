@@ -7,7 +7,8 @@ from pathlib import Path
 
 import numpy as np
 
-from sudoku_solver import SudokuRandomSolver
+from sudoku import BOARD_LOC
+from sudoku.utils.sudoku_solver import SudokuRandomSolver
 
 
 class SudokuGenerator:
@@ -62,13 +63,11 @@ def main(num, difficulty):
         num (int): number of boards to generate
         difficulty (str): "easy", "medium", or "hard"
     """
-    Path(os.path.join(os.getcwd(), "boards", "easy")).mkdir(parents=True, exist_ok=True)
-    Path(os.path.join(os.getcwd(), "boards", "medium")).mkdir(
-        parents=True, exist_ok=True
-    )
-    Path(os.path.join(os.getcwd(), "boards", "hard")).mkdir(parents=True, exist_ok=True)
+    Path(os.path.join(BOARD_LOC, "easy")).mkdir(parents=True, exist_ok=True)
+    Path(os.path.join(BOARD_LOC, "medium")).mkdir(parents=True, exist_ok=True)
+    Path(os.path.join(BOARD_LOC, "hard")).mkdir(parents=True, exist_ok=True)
 
-    difficulty_dir = os.path.join(os.getcwd(), "boards", difficulty)
+    difficulty_dir = os.path.join(BOARD_LOC, difficulty)
     board_list = os.listdir(difficulty_dir)
     num_list = [int(f.split("_")[0]) for f in board_list]
 

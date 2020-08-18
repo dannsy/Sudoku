@@ -9,7 +9,7 @@ from collections import deque
 import numpy as np
 import pygame
 
-from sudoku_solver import SudokuSolver
+from sudoku.utils.sudoku_solver import SudokuSolver
 
 # color definitions
 BLACK = (0, 0, 0)
@@ -135,7 +135,7 @@ class SudokuGui:
             for j in range(9):
                 cell = self.cells[i, j]
                 cell.notes.clear()
-        self.solver = SudokuSolver(self.board)
+        self.solver = None
 
     def select_cell(self, pos):
         """Get selected cell from mouse position and highlight it
@@ -313,7 +313,7 @@ class SudokuGui:
                 state_changed, num = self.detect_num_pressed(keys)
 
                 if keys[pygame.K_SPACE] and not self.fill_own:
-                    # solve board command
+                    # solve board immediately
                     self.state.append(
                         (
                             self.board.copy(),
@@ -323,6 +323,20 @@ class SudokuGui:
                         )
                     )
                     self.solver = SudokuSolver(self.board)
+                    self.solver.solve()
+                if keys[pygame.K_v] and not self.fill_own:
+                    from sudoku.utils.sudoku_visual import SudokuVisualSolver
+
+                    # solve board visually
+                    self.state.append(
+                        (
+                            self.board.copy(),
+                            copy.deepcopy(self.cells_notes),
+                            self.selected_row,
+                            self.selected_col,
+                        )
+                    )
+                    self.solver = SudokuVisualSolver(self.board, self.display)
                     self.solver.solve()
                 if keys[pygame.K_c] and keys[pygame.K_LCTRL]:
                     # clear board command
@@ -646,22 +660,3 @@ class Cell:
 
     def __repr__(self):
         return str(self.base_num)
-
-
-if __name__ == "__main__":
-    pygame.init()
-    test_board = np.array(
-        [
-            [0, 0, 6, 2, 0, 7, 0, 0, 0],
-            [0, 0, 0, 0, 0, 5, 6, 0, 0],
-            [1, 0, 0, 8, 0, 0, 2, 0, 5],
-            [0, 4, 0, 0, 0, 8, 0, 2, 0],
-            [2, 9, 0, 0, 0, 0, 0, 0, 0],
-            [6, 0, 0, 0, 1, 2, 4, 9, 0],
-            [0, 0, 0, 0, 0, 0, 0, 0, 0],
-            [0, 3, 7, 0, 0, 0, 0, 1, 9],
-            [0, 0, 5, 0, 3, 0, 0, 0, 0],
-        ]
-    )
-    gui = SudokuGui(test_board)
-    gui.start_game()
