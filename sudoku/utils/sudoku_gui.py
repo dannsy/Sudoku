@@ -209,9 +209,9 @@ class SudokuGui:
         Args:
             keys (dict): dictionary containing keys that have been pressed
         """
-        top = pygame.K_UP
+        arrow_keys = [pygame.K_UP, pygame.K_DOWN, pygame.K_RIGHT, pygame.K_LEFT]
         directions = ["top", "down", "right", "left"]
-        for key, direc in zip(range(top, top + 4), directions):
+        for key, direc in zip(arrow_keys, directions):
             if keys[key]:
                 self.move_select_cell(direc)
 

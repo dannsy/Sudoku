@@ -187,7 +187,6 @@ class SudokuGame:
             self.display.fill(WHITE_BLUE, self.play_but)
             # EASY button
             self.display.fill(LIGHT_BLUE, self.easy_but)
-            temp = (self.bb_height - self.sb_height) // 2
             # MEDIUM button
             self.display.fill(LIGHT_BLUE, self.med_but)
             # HARD button
@@ -196,13 +195,17 @@ class SudokuGame:
             font = pygame.font.SysFont("arial", 18)
             text = font.render("EASY", True, BLACK)
             self.display.blit(
-                text, (self.sb_xpos + 15, self.bb0_ypos - self.sb_height + 6),
+                text,
+                (self.sb_xpos + 15, self.easy_but.centery - text.get_height() // 2),
             )
             text = font.render("MEDIUM", True, BLACK)
-            self.display.blit(text, (self.sb_xpos + 15, self.bb0_ypos + temp + 6))
+            self.display.blit(
+                text, (self.sb_xpos + 15, self.med_but.centery - text.get_height() // 2)
+            )
             text = font.render("HARD", True, BLACK)
             self.display.blit(
-                text, (self.sb_xpos + 15, self.bb0_ypos + self.bb_height + 6)
+                text,
+                (self.sb_xpos + 15, self.hard_but.centery - text.get_height() // 2),
             )
         else:
             # PLAY button before pressed
@@ -216,15 +219,15 @@ class SudokuGame:
 
         font = pygame.font.SysFont("arial", 30)
         text = font.render("PLAY", True, BLACK)
-        self.display.blit(
-            text, (self.width // 2 - text.get_width() // 2, self.bb0_ypos + 10)
-        )
+        text_x = self.width // 2 - text.get_width() // 2
+        text_y = self.play_but.centery - text.get_height() // 2
+        self.display.blit(text, (text_x, text_y))
 
         font = pygame.font.SysFont("arial", 30)
         text = font.render("INPUT", True, BLACK)
-        self.display.blit(
-            text, (self.width // 2 - text.get_width() // 2, self.bb1_ypos + 10)
-        )
+        text_x = self.width // 2 - text.get_width() // 2
+        text_y = self.input_but.centery - text.get_height() // 2
+        self.display.blit(text, (text_x, text_y))
 
         if FPS_FLAG:
             fps = str(self.clock.get_fps())
