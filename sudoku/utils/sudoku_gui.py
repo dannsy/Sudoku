@@ -456,44 +456,28 @@ class SudokuGui:
     def draw_grid_lines(self):
         """Drawing the grid lines of the Sudoku board
         """
-        thin_line = 1
-        thick_line = 3
         # drawing the grey thin grid lines
         for i in range(10):
             # horizontal lines
-            pygame.draw.line(
-                self.display,
-                GREY,
-                (0, i * self.spacing + self.top_pad),
-                (self.width, i * self.spacing + self.top_pad),
-                thin_line,
-            )
+            start_pos = (0, i * self.spacing + self.top_pad)
+            end_pos = (self.width, i * self.spacing + self.top_pad)
+            pygame.draw.line(self.display, GREY, start_pos, end_pos, 1)
+
             # vertical lines
-            pygame.draw.line(
-                self.display,
-                GREY,
-                (i * self.spacing, self.top_pad),
-                (i * self.spacing, self.width + self.top_pad),
-                thin_line,
-            )
+            start_pos = (i * self.spacing, self.top_pad)
+            end_pos = (i * self.spacing, self.width + self.top_pad)
+            pygame.draw.line(self.display, GREY, start_pos, end_pos, 1)
         # drawing the black thick grid lines
         for i in range(0, 10, 3):
             # horizontal lines
-            pygame.draw.line(
-                self.display,
-                BLACK,
-                (0, i * self.spacing + self.top_pad),
-                (self.width, i * self.spacing + self.top_pad),
-                thick_line,
-            )
+            start_pos = (0, i * self.spacing + self.top_pad)
+            end_pos = (self.width, i * self.spacing + self.top_pad)
+            pygame.draw.line(self.display, BLACK, start_pos, end_pos, 3)
+
             # vertical lines
-            pygame.draw.line(
-                self.display,
-                BLACK,
-                (i * self.spacing, self.top_pad),
-                (i * self.spacing, self.width + self.top_pad),
-                thick_line,
-            )
+            start_pos = (i * self.spacing, self.top_pad)
+            end_pos = (i * self.spacing, self.width + self.top_pad)
+            pygame.draw.line(self.display, BLACK, start_pos, end_pos, 3)
 
     def draw_numbers(self):
         """Drawing numbers on the board
